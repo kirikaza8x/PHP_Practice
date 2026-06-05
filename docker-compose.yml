@@ -1,0 +1,19 @@
+
+version: '3.8'
+
+services:
+  php:
+    image: php:8.2-apache
+    container_name: php-learning
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount your code
+      - ./public:/var/www/html
+      - ./src:/var/www/src
+      - ./composer.json:/var/www/composer.json
+      
+      # IMPORTANT: Mount vendor as an anonymous volume 
+      # This prevents your local (empty) vendor folder from hiding the container's vendor folder
+      - /var/www/vendor
+    restart: unless-stopped
