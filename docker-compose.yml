@@ -1,19 +1,39 @@
-
 version: '3.8'
 
 services:
   php:
     image: php:8.2-apache
+    build: .  
     container_name: php-learning
     ports:
       - "8080:80"
     volumes:
-      # Mount your code
       - ./public:/var/www/html
       - ./src:/var/www/src
       - ./composer.json:/var/www/composer.json
-      
-      # IMPORTANT: Mount vendor as an anonymous volume 
-      # This prevents your local (empty) vendor folder from hiding the container's vendor folder
       - /var/www/vendor
     restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # These env vars are available in your PHP code via getenv() or $_ENV
+      DB_HOST: db
+      DB_DATABASE: practice_db
+      DB_USER: practice_user
+      DB_PASSWORD: secret_password
+
+  db:
+    image: postgres:15-alpine
+    container_name: php-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: practice_db
+      POSTGRES_USER: practice_user
+      POSTGRES_PASSWORD: secret_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
